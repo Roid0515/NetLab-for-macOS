@@ -1,0 +1,353 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		200000000000000000000001 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000001 /* main.mm */; };
+		200000000000000000000002 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000002 /* AppDelegate.mm */; };
+		200000000000000000000003 /* MainWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000003 /* MainWindowController.mm */; };
+		200000000000000000000004 /* DeviceCatalog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000004 /* DeviceCatalog.cpp */; };
+		200000000000000000000005 /* DeviceAppearance.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000005 /* DeviceAppearance.mm */; };
+		200000000000000000000006 /* DeviceNodeView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000006 /* DeviceNodeView.mm */; };
+		200000000000000000000007 /* DevicePaletteView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000007 /* DevicePaletteView.mm */; };
+		200000000000000000000008 /* TopologyView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000008 /* TopologyView.mm */; };
+		200000000000000000000009 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 100000000000000000000014 /* AppKit.framework */; };
+		20000000000000000000000A /* Link.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000015 /* Link.cpp */; };
+		20000000000000000000000B /* LinkLayerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000017 /* LinkLayerController.mm */; };
+		20000000000000000000000C /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 100000000000000000000019 /* QuartzCore.framework */; };
+		20000000000000000000000D /* IPv4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000001A /* IPv4.cpp */; };
+		20000000000000000000000E /* NetworkInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000001C /* NetworkInterface.cpp */; };
+		20000000000000000000000F /* Device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000001E /* Device.cpp */; };
+		200000000000000000000010 /* SimulationEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000020 /* SimulationEngine.cpp */; };
+		200000000000000000000011 /* DeviceInspectorView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000022 /* DeviceInspectorView.mm */; };
+		200000000000000000000012 /* DeviceSidebarView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000024 /* DeviceSidebarView.mm */; };
+		200000000000000000000013 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000026 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		100000000000000000000001 /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		100000000000000000000002 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
+		100000000000000000000003 /* MainWindowController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MainWindowController.mm; sourceTree = "<group>"; };
+		100000000000000000000004 /* DeviceCatalog.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DeviceCatalog.cpp; sourceTree = "<group>"; };
+		100000000000000000000005 /* DeviceAppearance.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DeviceAppearance.mm; sourceTree = "<group>"; };
+		100000000000000000000006 /* DeviceNodeView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DeviceNodeView.mm; sourceTree = "<group>"; };
+		100000000000000000000007 /* DevicePaletteView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DevicePaletteView.mm; sourceTree = "<group>"; };
+		100000000000000000000008 /* TopologyView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = TopologyView.mm; sourceTree = "<group>"; };
+		100000000000000000000009 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		10000000000000000000000A /* MainWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MainWindowController.h; sourceTree = "<group>"; };
+		10000000000000000000000B /* DeviceDefinition.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = DeviceDefinition.hpp; sourceTree = "<group>"; };
+		10000000000000000000000C /* DeviceCatalog.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = DeviceCatalog.hpp; sourceTree = "<group>"; };
+		10000000000000000000000D /* DeviceAppearance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceAppearance.h; sourceTree = "<group>"; };
+		10000000000000000000000E /* DeviceNodeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceNodeView.h; sourceTree = "<group>"; };
+		10000000000000000000000F /* DevicePaletteView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DevicePaletteView.h; sourceTree = "<group>"; };
+		100000000000000000000010 /* TopologyView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TopologyView.h; sourceTree = "<group>"; };
+		100000000000000000000011 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		100000000000000000000012 /* NetLab.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetLab.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		100000000000000000000013 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		100000000000000000000014 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		100000000000000000000015 /* Link.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Link.cpp; sourceTree = "<group>"; };
+		100000000000000000000016 /* Link.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Link.hpp; sourceTree = "<group>"; };
+		100000000000000000000017 /* LinkLayerController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LinkLayerController.mm; sourceTree = "<group>"; };
+		100000000000000000000018 /* LinkLayerController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LinkLayerController.h; sourceTree = "<group>"; };
+		100000000000000000000019 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		10000000000000000000001A /* IPv4.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = IPv4.cpp; sourceTree = "<group>"; };
+		10000000000000000000001B /* IPv4.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = IPv4.hpp; sourceTree = "<group>"; };
+		10000000000000000000001C /* NetworkInterface.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkInterface.cpp; sourceTree = "<group>"; };
+		10000000000000000000001D /* NetworkInterface.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = NetworkInterface.hpp; sourceTree = "<group>"; };
+		10000000000000000000001E /* Device.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Device.cpp; sourceTree = "<group>"; };
+		10000000000000000000001F /* Device.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Device.hpp; sourceTree = "<group>"; };
+		100000000000000000000020 /* SimulationEngine.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SimulationEngine.cpp; sourceTree = "<group>"; };
+		100000000000000000000021 /* SimulationEngine.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SimulationEngine.hpp; sourceTree = "<group>"; };
+		100000000000000000000022 /* DeviceInspectorView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DeviceInspectorView.mm; sourceTree = "<group>"; };
+		100000000000000000000023 /* DeviceInspectorView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceInspectorView.h; sourceTree = "<group>"; };
+		100000000000000000000024 /* DeviceSidebarView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DeviceSidebarView.mm; sourceTree = "<group>"; };
+		100000000000000000000025 /* DeviceSidebarView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceSidebarView.h; sourceTree = "<group>"; };
+		100000000000000000000026 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		100000000000000000000027 /* AppIcon.svg */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = AppIcon.svg; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		700000000000000000000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				200000000000000000000009 /* AppKit.framework in Frameworks */,
+				20000000000000000000000C /* QuartzCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		300000000000000000000000 = {
+			isa = PBXGroup;
+			children = (
+				300000000000000000000002 /* NetLab */,
+				300000000000000000000007 /* Frameworks */,
+				100000000000000000000013 /* README.md */,
+				300000000000000000000001 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		300000000000000000000001 /* Products */ = {
+			isa = PBXGroup;
+			children = (100000000000000000000012 /* NetLab.app */,);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		300000000000000000000002 /* NetLab */ = {
+			isa = PBXGroup;
+			children = (
+				300000000000000000000003 /* App */,
+				300000000000000000000004 /* Core */,
+				300000000000000000000005 /* UI */,
+				300000000000000000000008 /* Protocol */,
+				300000000000000000000006 /* Resources */,
+			);
+			path = NetLab;
+			sourceTree = "<group>";
+		};
+		300000000000000000000003 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000001 /* main.mm */,
+				100000000000000000000009 /* AppDelegate.h */,
+				100000000000000000000002 /* AppDelegate.mm */,
+				10000000000000000000000A /* MainWindowController.h */,
+				100000000000000000000003 /* MainWindowController.mm */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		300000000000000000000004 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				10000000000000000000000B /* DeviceDefinition.hpp */,
+				10000000000000000000000C /* DeviceCatalog.hpp */,
+				100000000000000000000004 /* DeviceCatalog.cpp */,
+				100000000000000000000016 /* Link.hpp */,
+				100000000000000000000015 /* Link.cpp */,
+				10000000000000000000001D /* NetworkInterface.hpp */,
+				10000000000000000000001C /* NetworkInterface.cpp */,
+				10000000000000000000001F /* Device.hpp */,
+				10000000000000000000001E /* Device.cpp */,
+				100000000000000000000021 /* SimulationEngine.hpp */,
+				100000000000000000000020 /* SimulationEngine.cpp */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		300000000000000000000005 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				10000000000000000000000D /* DeviceAppearance.h */,
+				100000000000000000000005 /* DeviceAppearance.mm */,
+				10000000000000000000000E /* DeviceNodeView.h */,
+				100000000000000000000006 /* DeviceNodeView.mm */,
+				10000000000000000000000F /* DevicePaletteView.h */,
+				100000000000000000000007 /* DevicePaletteView.mm */,
+				100000000000000000000010 /* TopologyView.h */,
+				100000000000000000000008 /* TopologyView.mm */,
+				100000000000000000000018 /* LinkLayerController.h */,
+				100000000000000000000017 /* LinkLayerController.mm */,
+				100000000000000000000023 /* DeviceInspectorView.h */,
+				100000000000000000000022 /* DeviceInspectorView.mm */,
+				100000000000000000000025 /* DeviceSidebarView.h */,
+				100000000000000000000024 /* DeviceSidebarView.mm */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		300000000000000000000006 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000011 /* Info.plist */,
+				100000000000000000000026 /* Assets.xcassets */,
+				100000000000000000000027 /* AppIcon.svg */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		300000000000000000000007 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000014 /* AppKit.framework */,
+				100000000000000000000019 /* QuartzCore.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		300000000000000000000008 /* Protocol */ = {
+			isa = PBXGroup;
+			children = (
+				10000000000000000000001B /* IPv4.hpp */,
+				10000000000000000000001A /* IPv4.cpp */,
+			);
+			path = Protocol;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		400000000000000000000001 /* NetLab */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 600000000000000000000002 /* Build configuration list for PBXNativeTarget "NetLab" */;
+			buildPhases = (
+				700000000000000000000001 /* Sources */,
+				700000000000000000000002 /* Frameworks */,
+				700000000000000000000003 /* Resources */,
+			);
+			buildRules = ();
+			dependencies = ();
+			name = NetLab;
+			productName = NetLab;
+			productReference = 100000000000000000000012 /* NetLab.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		500000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {400000000000000000000001 = {CreatedOnToolsVersion = 26.0;};};
+			};
+			buildConfigurationList = 600000000000000000000001 /* Build configuration list for PBXProject "NetLab" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, Base,);
+			mainGroup = 300000000000000000000000;
+			productRefGroup = 300000000000000000000001 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (400000000000000000000001 /* NetLab */,);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		700000000000000000000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (200000000000000000000013 /* Assets.xcassets in Resources */,);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		700000000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				200000000000000000000001 /* main.mm in Sources */,
+				200000000000000000000002 /* AppDelegate.mm in Sources */,
+				200000000000000000000003 /* MainWindowController.mm in Sources */,
+				200000000000000000000004 /* DeviceCatalog.cpp in Sources */,
+				200000000000000000000005 /* DeviceAppearance.mm in Sources */,
+				200000000000000000000006 /* DeviceNodeView.mm in Sources */,
+				200000000000000000000007 /* DevicePaletteView.mm in Sources */,
+				200000000000000000000008 /* TopologyView.mm in Sources */,
+				20000000000000000000000A /* Link.cpp in Sources */,
+				20000000000000000000000B /* LinkLayerController.mm in Sources */,
+				20000000000000000000000D /* IPv4.cpp in Sources */,
+				20000000000000000000000E /* NetworkInterface.cpp in Sources */,
+				20000000000000000000000F /* Device.cpp in Sources */,
+				200000000000000000000010 /* SimulationEngine.cpp in Sources */,
+				200000000000000000000011 /* DeviceInspectorView.mm in Sources */,
+				200000000000000000000012 /* DeviceSidebarView.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		800000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("DEBUG=1", "$(inherited)",);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		800000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		800000000000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = NetLab/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.netlab.learning;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		800000000000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = NetLab/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.netlab.learning;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		600000000000000000000001 /* Build configuration list for PBXProject "NetLab" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (800000000000000000000001 /* Debug */, 800000000000000000000002 /* Release */,);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		600000000000000000000002 /* Build configuration list for PBXNativeTarget "NetLab" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (800000000000000000000003 /* Debug */, 800000000000000000000004 /* Release */,);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 500000000000000000000001 /* Project object */;
+}

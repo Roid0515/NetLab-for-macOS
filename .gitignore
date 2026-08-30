@@ -1,0 +1,15 @@
+# Xcode user state
+xcuserdata/
+*.xcuserstate
+
+# Local build products
+build/
+DerivedData/
+NetLab.app/
+dist/
+
+# Intermediate icon-generation folder (the source SVG and Assets.xcassets are tracked)
+NetLab/Resources/AppIcon.iconset/
+
+# macOS metadata
+.DS_Store

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="background" x1="160" y1="120" x2="880" y2="920" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#19b9b0"/>
+      <stop offset="0.55" stop-color="#087f9c"/>
+      <stop offset="1" stop-color="#174270"/>
+    </linearGradient>
+    <linearGradient id="switchFace" x1="270" y1="380" x2="760" y2="690" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f8fbff"/>
+      <stop offset="1" stop-color="#c8dce8"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="30" stdDeviation="32" flood-color="#06223b" flood-opacity="0.38"/>
+    </filter>
+  </defs>
+  <rect x="64" y="64" width="896" height="896" rx="208" fill="url(#background)"/>
+
+  <g fill="none" stroke="#bdf8f2" stroke-width="24" stroke-linecap="round" opacity="0.86">
+    <path d="M245 332V244H512V174"/>
+    <path d="M779 332V244H650"/>
+    <path d="M245 692V780H376V850"/>
+    <path d="M779 692V780H648V850"/>
+  </g>
+  <g fill="#e8fffc">
+    <circle cx="512" cy="174" r="31"/>
+    <circle cx="650" cy="244" r="31"/>
+    <circle cx="376" cy="850" r="31"/>
+    <circle cx="648" cy="850" r="31"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="176" y="332" width="672" height="360" rx="82" fill="url(#switchFace)"/>
+    <rect x="210" y="366" width="604" height="292" rx="58" fill="#153b5a"/>
+    <rect x="242" y="400" width="540" height="224" rx="40" fill="#0c2b45"/>
+  </g>
+
+  <g fill="#54e2ca">
+    <circle cx="284" cy="445" r="16"/>
+    <circle cx="332" cy="445" r="16"/>
+  </g>
+  <g fill="#c7ecf2">
+    <rect x="270" y="500" width="86" height="70" rx="12"/>
+    <rect x="370" y="500" width="86" height="70" rx="12"/>
+    <rect x="470" y="500" width="86" height="70" rx="12"/>
+    <rect x="570" y="500" width="86" height="70" rx="12"/>
+    <rect x="670" y="500" width="86" height="70" rx="12"/>
+  </g>
+  <g fill="#2a6787">
+    <rect x="286" y="518" width="54" height="34" rx="6"/>
+    <rect x="386" y="518" width="54" height="34" rx="6"/>
+    <rect x="486" y="518" width="54" height="34" rx="6"/>
+    <rect x="586" y="518" width="54" height="34" rx="6"/>
+    <rect x="686" y="518" width="54" height="34" rx="6"/>
+  </g>
+  <path d="M414 445H700" stroke="#6fb5ce" stroke-width="18" stroke-linecap="round"/>
+</svg>
