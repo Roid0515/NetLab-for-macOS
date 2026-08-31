@@ -8,7 +8,7 @@
 - 선택된 노드의 Inspector에 빨간색 **Delete Device** 버튼 추가
 - 기존 Toolbar Delete와 Delete/Backspace 키 지원 유지
 - 노드 삭제 시 연결된 링크가 함께 제거되는 자동 UI 테스트 추가
-- 자체 제작 네트워크 스위치 AppIcon 포함
+- 사용자 제공 네트워크 스위치 이미지를 기반으로 한 AppIcon 포함
 
 ## 기존 기능
 

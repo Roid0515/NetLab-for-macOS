@@ -66,7 +66,7 @@
 		100000000000000000000024 /* DeviceSidebarView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DeviceSidebarView.mm; sourceTree = "<group>"; };
 		100000000000000000000025 /* DeviceSidebarView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceSidebarView.h; sourceTree = "<group>"; };
 		100000000000000000000026 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		100000000000000000000027 /* AppIcon.svg */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = AppIcon.svg; sourceTree = "<group>"; };
+		100000000000000000000027 /* AppIconSource.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AppIconSource.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -166,7 +166,7 @@
 			children = (
 				100000000000000000000011 /* Info.plist */,
 				100000000000000000000026 /* Assets.xcassets */,
-				100000000000000000000027 /* AppIcon.svg */,
+				100000000000000000000027 /* AppIconSource.png */,
 			);
 			path = Resources;
 			sourceTree = "<group>";

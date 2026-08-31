@@ -23,6 +23,7 @@ xcodebuild -project NetLab.xcodeproj -scheme NetLab -configuration Release build
 - Demo: 두 Subnet, Router, Services, AP, Firewall을 포함한 통합 학습 토폴로지
 - Add Device: 선택된 노드의 Inspector에서 장비 목록으로 즉시 전환
 - Delete Device: Toolbar, Delete/Backspace 키, 노드 우클릭 메뉴, Inspector 버튼 지원
+- AppIcon: 네트워크 스위치 학습 이미지를 macOS 전용 크기별 Asset으로 포함
 
 STP/동적 라우팅/IPv6/Wireless/Firewall/VPN은 실제 운영체제 네트워크나 암호화를 사용하는 에뮬레이션이 아니라 핵심 개념과 상태를 보여 주는 단순화 모델입니다.
 
