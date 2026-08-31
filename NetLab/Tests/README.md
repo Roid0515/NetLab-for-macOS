@@ -1,3 +1,8 @@
 # Tests
 
-Automated engine and model tests belong here. The executable exposes `--self-test` for Core catalog/link/IPv4/Ping checks and `--ui-self-test` for AppKit layout plus PC–Switch–PC Ping integration.
+Automated Core and simulation tests live in the separate `NetLabTests` target at the repository root. Production startup code contains no test command-line branches.
+
+```sh
+xcodebuild -project NetLab.xcodeproj -scheme NetLabTests -configuration Debug -derivedDataPath build build
+./build/Build/Products/Debug/NetLabTests
+```

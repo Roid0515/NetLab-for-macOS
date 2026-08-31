@@ -58,7 +58,7 @@ Switch를 클릭하고 Interface마다 **Access** 또는 **Trunk**, VLAN ID를 �
 
 - PC가 연결된 포트는 보통 Access로 설정합니다.
 - Switch끼리 연결된 포트는 Trunk로 설정합니다.
-- Trunk는 학습용 기본 허용 목록으로 VLAN 10과 20을 전달합니다.
+- Trunk는 해당 Interface에 입력한 VLAN만 전달합니다. 다른 VLAN은 별도로 같은 VLAN ID로 구성해야 합니다.
 - 경로 중 한 포트라도 해당 VLAN을 허용하지 않으면 Ping이 실패하고 `VLAN ... blocks` 이벤트가 표시됩니다.
 
 ## 6. DHCP와 학습 상태 보기

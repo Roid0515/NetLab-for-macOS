@@ -4,6 +4,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class DeviceNodeView;
 
+#ifdef __cplusplus
+namespace netlab { class Link; }
+#endif
+
 @interface LinkLayerController : NSObject
 
 @property(nonatomic, copy, readonly) NSString *linkIdentifier;
@@ -23,6 +27,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)containsPoint:(NSPoint)point tolerance:(CGFloat)tolerance;
 - (BOOL)isAttachedToNode:(DeviceNodeView *)node;
 - (void)invalidate;
+
+#ifdef __cplusplus
+- (const netlab::Link &)model;
+#endif
 
 @end
 

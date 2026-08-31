@@ -11,12 +11,27 @@
 
 namespace netlab {
 
-void SimulationEngine::addDevice(Device& device) {
+bool SimulationEngine::addDevice(Device& device) {
+    if (findDeviceWithIdentifier(device.identifier())) return false;
     devices_.push_back(&device);
+    return true;
 }
 
-void SimulationEngine::addEthernetConnection(EthernetConnection connection) {
-    connections_.push_back(std::move(connection));
+bool SimulationEngine::addLink(const Link& link) {
+    if (!findDeviceWithIdentifier(link.firstEndpoint().deviceIdentifier) ||
+        !findDeviceWithIdentifier(link.secondEndpoint().deviceIdentifier)) return false;
+    for (const Link* existing : links_) {
+        if (existing->identifier() == link.identifier()) return false;
+        const auto endpointInUse = [&](const LinkEndpoint& endpoint) {
+            return (existing->firstEndpoint().deviceIdentifier == endpoint.deviceIdentifier &&
+                    existing->firstEndpoint().interfaceName == endpoint.interfaceName) ||
+                   (existing->secondEndpoint().deviceIdentifier == endpoint.deviceIdentifier &&
+                    existing->secondEndpoint().interfaceName == endpoint.interfaceName);
+        };
+        if (endpointInUse(link.firstEndpoint()) || endpointInUse(link.secondEndpoint())) return false;
+    }
+    links_.push_back(&link);
+    return true;
 }
 
 Device* SimulationEngine::findDeviceWithAddress(const std::string& address) const noexcept {
@@ -26,22 +41,43 @@ Device* SimulationEngine::findDeviceWithAddress(const std::string& address) cons
     return nullptr;
 }
 
+Device* SimulationEngine::findDeviceWithIdentifier(const std::string& identifier) const noexcept {
+    for (Device* device : devices_) if (device->identifier() == identifier) return device;
+    return nullptr;
+}
+
 Device* SimulationEngine::findDefaultGateway(const Device& source) const noexcept {
     if (source.defaultGateway().empty()) return nullptr;
     return findDeviceWithAddress(source.defaultGateway());
 }
 
-std::string SimulationEngine::resolveDestination(const std::string& addressOrName,
+std::string SimulationEngine::resolveDestination(Device& source, const std::string& addressOrName,
                                                   std::vector<SimulationEvent>& events) const {
     std::uint32_t ignored = 0;
     if (ipv4::parse(addressOrName, ignored)) return addressOrName;
-    for (Device* device : devices_) {
-        auto record = device->dnsRecords().find(addressOrName);
-        if (record != device->dnsRecords().end()) {
-            events.push_back({"DNS", device->hostname() + " resolves " + addressOrName + " to " + record->second + "."});
-            return record->second;
-        }
+    if (source.dnsServer().empty()) {
+        events.push_back({"DNS", source.hostname() + " has no configured DNS server."});
+        return {};
     }
+    Device* server = findDeviceWithAddress(source.dnsServer());
+    if (!server || !server->supportsCapability("DNS_SERVER")) {
+        events.push_back({"DNS", "Configured DNS server " + source.dnsServer() + " is unavailable."});
+        return {};
+    }
+    std::vector<SimulationEvent> reachabilityEvents;
+    std::vector<PathHop> path = findLayer2Path(source, *server);
+    int vlanID = 1;
+    if (path.empty() || !validateVLANPath(path, vlanID, reachabilityEvents)) {
+        events.push_back({"DNS", "Configured DNS server " + source.dnsServer() +
+                         " is unreachable on the active VLAN topology."});
+        return {};
+    }
+    auto record = server->dnsRecords().find(addressOrName);
+    if (record != server->dnsRecords().end()) {
+        events.push_back({"DNS", server->hostname() + " resolves " + addressOrName + " to " + record->second + "."});
+        return record->second;
+    }
+    events.push_back({"DNS", server->hostname() + " has no record for " + addressOrName + "."});
     return {};
 }
 
@@ -61,22 +97,30 @@ std::vector<SimulationEngine::PathHop> SimulationEngine::findLayer2Path(Device& 
     while (!pending.empty()) {
         Device* current = pending.front();
         pending.pop();
+        if (!current) continue;
         if (current == &destination) break;
         if (current != &source && current->role() != DeviceRole::Switch) continue;
-        for (const auto& connection : connections_) {
+        for (const Link* link : links_) {
+            if (!link || link->state() != LinkState::Up) continue;
+            Device* firstDevice = findDeviceWithIdentifier(link->firstEndpoint().deviceIdentifier);
+            Device* secondDevice = findDeviceWithIdentifier(link->secondEndpoint().deviceIdentifier);
             Device* neighbor = nullptr;
             std::string currentInterface;
             std::string neighborInterface;
-            if (connection.firstDevice == current) {
-                neighbor = connection.secondDevice;
-                currentInterface = connection.firstInterface;
-                neighborInterface = connection.secondInterface;
-            } else if (connection.secondDevice == current) {
-                neighbor = connection.firstDevice;
-                currentInterface = connection.secondInterface;
-                neighborInterface = connection.firstInterface;
+            if (firstDevice == current) {
+                neighbor = secondDevice;
+                currentInterface = link->firstEndpoint().interfaceName;
+                neighborInterface = link->secondEndpoint().interfaceName;
+            } else if (secondDevice == current) {
+                neighbor = firstDevice;
+                currentInterface = link->secondEndpoint().interfaceName;
+                neighborInterface = link->firstEndpoint().interfaceName;
             }
-            if (!neighbor || visited.count(neighbor)) continue;
+            if (!neighbor) continue;
+            const NetworkInterface* currentPort = current->interfaceNamed(currentInterface);
+            const NetworkInterface* neighborPort = neighbor->interfaceNamed(neighborInterface);
+            if (!currentPort || !neighborPort || !currentPort->adminUp() || !neighborPort->adminUp()) continue;
+            if (visited.count(neighbor)) continue;
             visited.insert(neighbor);
             parents[neighbor] = {current, neighborInterface, currentInterface};
             pending.push(neighbor);
@@ -172,7 +216,7 @@ bool SimulationEngine::processLayer2Segment(Device& sender, Device& receiver,
 
 PingResult SimulationEngine::ping(Device& source, const std::string& destinationAddress) {
     PingResult result;
-    const std::string resolvedAddress = resolveDestination(destinationAddress, result.events);
+    const std::string resolvedAddress = resolveDestination(source, destinationAddress, result.events);
     std::uint32_t ignored = 0;
     if (resolvedAddress.empty() || !ipv4::parse(resolvedAddress, ignored)) {
         result.summary = "Invalid IPv4 destination or DNS name not found.";
@@ -252,39 +296,103 @@ PingResult SimulationEngine::ping(Device& source, const std::string& destination
 
 ServiceResult SimulationEngine::requestDHCP(Device& client) {
     ServiceResult result;
+    if (!client.supportsCapability("DHCP_CLIENT")) {
+        result.summary = "This device does not support DHCP client operation.";
+        return result;
+    }
     NetworkInterface* clientInterface = client.interfaces().empty() ? nullptr : &client.interfaces().front();
-    if (!clientInterface) {
-        result.summary = "Client has no network interface.";
+    if (!clientInterface || !clientInterface->adminUp()) {
+        result.summary = "Client has no enabled network interface.";
         return result;
     }
     result.events.push_back({"DHCP", "DHCPDISCOVER broadcast sent by " + client.hostname() + "."});
     Device* server = nullptr;
-    for (Device* candidate : devices_) if (candidate->dhcpServerEnabled()) { server = candidate; break; }
+    for (Device* candidate : devices_) {
+        if (!candidate->dhcpServerEnabled()) continue;
+        std::vector<PathHop> path = findLayer2Path(client, *candidate);
+        std::vector<SimulationEvent> vlanEvents;
+        int vlanID = 1;
+        if (path.empty() || !validateVLANPath(path, vlanID, vlanEvents)) continue;
+        server = candidate;
+        result.events.insert(result.events.end(), vlanEvents.begin(), vlanEvents.end());
+        result.events.push_back({"DHCP", candidate->hostname() +
+                                 " receives the broadcast on VLAN " + std::to_string(vlanID) + "."});
+        break;
+    }
     if (!server) {
-        result.summary = "No DHCP server is configured.";
+        result.summary = "No reachable DHCP server is available on this VLAN.";
         return result;
     }
-    std::uint32_t network = 0;
-    if (!ipv4::parse(server->dhcpNetwork(), network)) {
-        result.summary = "DHCP pool network is invalid.";
+    std::uint32_t configuredNetwork = 0, mask = 0;
+    if (!ipv4::parse(server->dhcpNetwork(), configuredNetwork) ||
+        !ipv4::parse(server->dhcpSubnetMask(), mask) ||
+        !ipv4::isValidSubnetMask(server->dhcpSubnetMask())) {
+        result.summary = "DHCP pool network or subnet mask is invalid.";
         return result;
     }
-    const std::uint32_t host = 100 + static_cast<std::uint32_t>(server->dhcpLeases().size());
-    const std::uint32_t addressValue = (network & 0xffffff00U) | (host & 0xffU);
-    std::ostringstream address;
-    address << ((addressValue >> 24) & 0xff) << '.' << ((addressValue >> 16) & 0xff) << '.'
-            << ((addressValue >> 8) & 0xff) << '.' << (addressValue & 0xff);
-    if (!clientInterface->configureIPv4(address.str(), server->dhcpSubnetMask()) ||
-        !client.setDefaultGateway(server->dhcpGateway())) {
+    const std::uint32_t network = configuredNetwork & mask;
+    const std::uint32_t broadcast = network | ~mask;
+    if (static_cast<std::uint64_t>(network) + 1 >= broadcast) {
+        result.summary = "DHCP pool has no usable host addresses.";
+        return result;
+    }
+
+    auto existingLease = server->dhcpLeases().find(client.identifier());
+    std::uint32_t addressValue = 0;
+    if (existingLease != server->dhcpLeases().end()) {
+        ipv4::parse(existingLease->second, addressValue);
+    } else {
+        std::set<std::uint32_t> usedAddresses;
+        for (Device* device : devices_) {
+            for (const auto& networkInterface : device->interfaces()) {
+                std::uint32_t used = 0;
+                if (ipv4::parse(networkInterface.ipv4Address(), used)) usedAddresses.insert(used);
+            }
+        }
+        for (const auto& lease : server->dhcpLeases()) {
+            std::uint32_t used = 0;
+            if (ipv4::parse(lease.second, used)) usedAddresses.insert(used);
+        }
+        std::uint32_t gateway = 0;
+        if (ipv4::parse(server->dhcpGateway(), gateway)) usedAddresses.insert(gateway);
+
+        const std::uint64_t firstUsable = static_cast<std::uint64_t>(network) + 1;
+        const std::uint64_t lastUsable = static_cast<std::uint64_t>(broadcast) - 1;
+        std::uint64_t preferred = static_cast<std::uint64_t>(network) + 100;
+        if (preferred < firstUsable || preferred > lastUsable) preferred = firstUsable;
+        for (std::uint64_t candidate = preferred; candidate <= lastUsable; ++candidate) {
+            if (!usedAddresses.count(static_cast<std::uint32_t>(candidate))) {
+                addressValue = static_cast<std::uint32_t>(candidate);
+                break;
+            }
+        }
+        if (addressValue == 0 && preferred != firstUsable) {
+            for (std::uint64_t candidate = firstUsable; candidate < preferred; ++candidate) {
+                if (!usedAddresses.count(static_cast<std::uint32_t>(candidate))) {
+                    addressValue = static_cast<std::uint32_t>(candidate);
+                    break;
+                }
+            }
+        }
+        if (addressValue == 0) {
+            result.summary = "DHCP address pool is exhausted.";
+            return result;
+        }
+    }
+
+    const std::string address = ipv4::format(addressValue);
+    if (!client.applyDHCPLeaseConfiguration(clientInterface->name(), address,
+                                             server->dhcpSubnetMask(), server->dhcpGateway(),
+                                             server->dhcpDNSServer())) {
         result.summary = "DHCP offer contained invalid configuration.";
         return result;
     }
-    server->addDHCPLease(client.identifier(), address.str());
-    result.events.push_back({"DHCP", server->hostname() + " sends DHCPOFFER " + address.str() + "."});
+    server->addDHCPLease(client.identifier(), address);
+    result.events.push_back({"DHCP", server->hostname() + " sends DHCPOFFER " + address + "."});
     result.events.push_back({"DHCP", "DHCPREQUEST / DHCPACK completed; gateway=" + server->dhcpGateway() +
                              " DNS=" + server->dhcpDNSServer() + "."});
     result.success = true;
-    result.summary = "Lease applied: " + address.str() + " / " + server->dhcpSubnetMask();
+    result.summary = "Lease applied: " + address + " / " + server->dhcpSubnetMask();
     return result;
 }
 

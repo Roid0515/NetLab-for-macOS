@@ -159,27 +159,6 @@ static NSToolbarItemIdentifier const NLToolbarFit = @"netlab.fit";
         accessibilityDescription:@"Connect devices"];
 }
 
-- (BOOL)runLayoutSelfTest {
-    [self.window.contentView layoutSubtreeIfNeeded];
-    if (NSWidth(self.window.contentView.bounds) <= 0 || NSHeight(self.window.contentView.bounds) <= 0) return NO;
-    if (NSWidth(_topologyView.frame) <= 0 || NSHeight(_topologyView.frame) <= 0) return NO;
-    if (self.window.contentView.subviews.count != 2) return NO;
-    NSView *palette = self.window.contentView.subviews[1];
-    if (NSWidth(palette.frame) < 240 || NSHeight(palette.frame) <= 0) return NO;
-    BOOL demoPassed = [_topologyView runMilestone7SelfTest] &&
-                      _topologyView.deviceCount == 8 && _topologyView.linkCount == 7;
-    BOOL deletionPassed = [_topologyView runNodeDeletionSelfTest] &&
-                          _topologyView.deviceCount == 7 && _topologyView.linkCount == 6;
-    [_topologyView showDevicePalette];
-    BOOL palettePassed = _sidebarView.isShowingDevicePalette;
-    if (!demoPassed || !deletionPassed || !palettePassed) {
-        NSLog(@"UI self-test detail: demo=%d deletion=%d palette=%d devices=%lu links=%lu",
-              demoPassed, deletionPassed, palettePassed,
-              (unsigned long)_topologyView.deviceCount, (unsigned long)_topologyView.linkCount);
-    }
-    return demoPassed && deletionPassed && palettePassed;
-}
-
 - (void)topologyView:(TopologyView *)topologyView didSelectDevice:(DeviceNodeView *)device {
     [_sidebarView showDevice:device];
 }

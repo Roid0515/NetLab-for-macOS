@@ -25,6 +25,24 @@
 		200000000000000000000011 /* DeviceInspectorView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000022 /* DeviceInspectorView.mm */; };
 		200000000000000000000012 /* DeviceSidebarView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000024 /* DeviceSidebarView.mm */; };
 		200000000000000000000013 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000026 /* Assets.xcassets */; };
+		200000000000000000000014 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000028 /* main.cpp */; };
+		200000000000000000000015 /* DeviceCatalog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000004 /* DeviceCatalog.cpp */; };
+		200000000000000000000016 /* Link.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000015 /* Link.cpp */; };
+		200000000000000000000017 /* IPv4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000001A /* IPv4.cpp */; };
+		200000000000000000000018 /* NetworkInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000001C /* NetworkInterface.cpp */; };
+		200000000000000000000019 /* Device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000001E /* Device.cpp */; };
+		20000000000000000000001A /* SimulationEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000020 /* SimulationEngine.cpp */; };
+		20000000000000000000001B /* UISmokeTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000002A /* UISmokeTests.mm */; };
+		20000000000000000000001C /* MainWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000003 /* MainWindowController.mm */; };
+		20000000000000000000001D /* DeviceAppearance.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000005 /* DeviceAppearance.mm */; };
+		20000000000000000000001E /* DeviceNodeView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000006 /* DeviceNodeView.mm */; };
+		20000000000000000000001F /* DevicePaletteView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000007 /* DevicePaletteView.mm */; };
+		200000000000000000000020 /* TopologyView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000008 /* TopologyView.mm */; };
+		200000000000000000000021 /* LinkLayerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000017 /* LinkLayerController.mm */; };
+		200000000000000000000022 /* DeviceInspectorView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000022 /* DeviceInspectorView.mm */; };
+		200000000000000000000023 /* DeviceSidebarView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000024 /* DeviceSidebarView.mm */; };
+		200000000000000000000024 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 100000000000000000000014 /* AppKit.framework */; };
+		200000000000000000000025 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 100000000000000000000019 /* QuartzCore.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -67,6 +85,9 @@
 		100000000000000000000025 /* DeviceSidebarView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceSidebarView.h; sourceTree = "<group>"; };
 		100000000000000000000026 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		100000000000000000000027 /* AppIconSource.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AppIconSource.png; sourceTree = "<group>"; };
+		100000000000000000000028 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		100000000000000000000029 /* NetLabTests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetLabTests; sourceTree = BUILT_PRODUCTS_DIR; };
+		10000000000000000000002A /* UISmokeTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = UISmokeTests.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +100,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		700000000000000000000005 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				200000000000000000000024 /* AppKit.framework in Frameworks */,
+				200000000000000000000025 /* QuartzCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -86,6 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				300000000000000000000002 /* NetLab */,
+				300000000000000000000009 /* NetLabTests */,
 				300000000000000000000007 /* Frameworks */,
 				100000000000000000000013 /* README.md */,
 				300000000000000000000001 /* Products */,
@@ -94,7 +125,10 @@
 		};
 		300000000000000000000001 /* Products */ = {
 			isa = PBXGroup;
-			children = (100000000000000000000012 /* NetLab.app */,);
+			children = (
+				100000000000000000000012 /* NetLab.app */,
+				100000000000000000000029 /* NetLabTests */,
+			);
 			name = Products;
 			sourceTree = "<group>";
 		};
@@ -189,6 +223,15 @@
 			path = Protocol;
 			sourceTree = "<group>";
 		};
+		300000000000000000000009 /* NetLabTests */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000028 /* main.cpp */,
+				10000000000000000000002A /* UISmokeTests.mm */,
+			);
+			path = NetLabTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -206,6 +249,20 @@
 			productName = NetLab;
 			productReference = 100000000000000000000012 /* NetLab.app */;
 			productType = "com.apple.product-type.application";
+		};
+		400000000000000000000002 /* NetLabTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 600000000000000000000003 /* Build configuration list for PBXNativeTarget "NetLabTests" */;
+			buildPhases = (
+				700000000000000000000004 /* Sources */,
+				700000000000000000000005 /* Frameworks */,
+			);
+			buildRules = ();
+			dependencies = ();
+			name = NetLabTests;
+			productName = NetLabTests;
+			productReference = 100000000000000000000029 /* NetLabTests */;
+			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
@@ -226,7 +283,10 @@
 			productRefGroup = 300000000000000000000001 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
-			targets = (400000000000000000000001 /* NetLab */,);
+			targets = (
+				400000000000000000000001 /* NetLab */,
+				400000000000000000000002 /* NetLabTests */,
+			);
 		};
 /* End PBXProject section */
 
@@ -260,6 +320,29 @@
 				200000000000000000000010 /* SimulationEngine.cpp in Sources */,
 				200000000000000000000011 /* DeviceInspectorView.mm in Sources */,
 				200000000000000000000012 /* DeviceSidebarView.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		700000000000000000000004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				200000000000000000000014 /* main.cpp in Sources */,
+				20000000000000000000001B /* UISmokeTests.mm in Sources */,
+				20000000000000000000001C /* MainWindowController.mm in Sources */,
+				20000000000000000000001D /* DeviceAppearance.mm in Sources */,
+				20000000000000000000001E /* DeviceNodeView.mm in Sources */,
+				20000000000000000000001F /* DevicePaletteView.mm in Sources */,
+				200000000000000000000020 /* TopologyView.mm in Sources */,
+				200000000000000000000021 /* LinkLayerController.mm in Sources */,
+				200000000000000000000022 /* DeviceInspectorView.mm in Sources */,
+				200000000000000000000023 /* DeviceSidebarView.mm in Sources */,
+				200000000000000000000015 /* DeviceCatalog.cpp in Sources */,
+				200000000000000000000016 /* Link.cpp in Sources */,
+				200000000000000000000017 /* IPv4.cpp in Sources */,
+				200000000000000000000018 /* NetworkInterface.cpp in Sources */,
+				200000000000000000000019 /* Device.cpp in Sources */,
+				20000000000000000000001A /* SimulationEngine.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -307,10 +390,10 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				INFOPLIST_FILE = NetLab/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.netlab.learning;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -323,11 +406,25 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				INFOPLIST_FILE = NetLab/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.netlab.learning;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		800000000000000000000005 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		800000000000000000000006 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -344,6 +441,15 @@
 		600000000000000000000002 /* Build configuration list for PBXNativeTarget "NetLab" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (800000000000000000000003 /* Debug */, 800000000000000000000004 /* Release */,);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		600000000000000000000003 /* Build configuration list for PBXNativeTarget "NetLabTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				800000000000000000000005 /* Debug */,
+				800000000000000000000006 /* Release */,
+			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};

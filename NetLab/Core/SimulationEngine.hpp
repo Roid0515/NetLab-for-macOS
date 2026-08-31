@@ -1,18 +1,12 @@
 #pragma once
 
 #include "Device.hpp"
+#include "Link.hpp"
 
 #include <string>
 #include <vector>
 
 namespace netlab {
-
-struct EthernetConnection {
-    Device* firstDevice;
-    std::string firstInterface;
-    Device* secondDevice;
-    std::string secondInterface;
-};
 
 struct SimulationEvent {
     std::string stage;
@@ -33,8 +27,8 @@ struct ServiceResult {
 
 class SimulationEngine final {
 public:
-    void addDevice(Device& device);
-    void addEthernetConnection(EthernetConnection connection);
+    bool addDevice(Device& device);
+    bool addLink(const Link& link);
     PingResult ping(Device& source, const std::string& destinationAddress);
     ServiceResult requestDHCP(Device& client);
     std::string advancedStatus(const Device& device) const;
@@ -47,8 +41,10 @@ private:
     };
 
     Device* findDeviceWithAddress(const std::string& address) const noexcept;
+    Device* findDeviceWithIdentifier(const std::string& identifier) const noexcept;
     Device* findDefaultGateway(const Device& source) const noexcept;
-    std::string resolveDestination(const std::string& addressOrName, std::vector<SimulationEvent>& events) const;
+    std::string resolveDestination(Device& source, const std::string& addressOrName,
+                                   std::vector<SimulationEvent>& events) const;
     std::vector<PathHop> findLayer2Path(Device& source, Device& destination) const;
     bool validateVLANPath(const std::vector<PathHop>& path, int& vlanID,
                           std::vector<SimulationEvent>& events) const;
@@ -56,7 +52,7 @@ private:
                               std::vector<SimulationEvent>& events);
 
     std::vector<Device*> devices_;
-    std::vector<EthernetConnection> connections_;
+    std::vector<const Link*> links_;
 };
 
 }  // namespace netlab

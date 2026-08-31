@@ -26,7 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithDeviceIdentifier:(NSString *)identifier
                               displayName:(NSString *)displayName
                            interfaceNames:(NSArray<NSString *> *)interfaceNames
-                          interfaceSpeeds:(NSArray<NSNumber *> *)interfaceSpeeds;
+                          interfaceSpeeds:(NSArray<NSNumber *> *)interfaceSpeeds
+                                     role:(NSInteger)role
+                             capabilities:(NSArray<NSString *> *)capabilities;
 - (NSInteger)speedMbpsForInterfaceNamed:(NSString *)interfaceName;
 - (NSString *)macAddressForInterfaceNamed:(NSString *)interfaceName;
 - (NSString *)ipv4AddressForInterfaceNamed:(NSString *)interfaceName;
@@ -45,6 +47,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)vlanModeForInterfaceNamed:(NSString *)interfaceName;
 - (NSInteger)vlanIDForInterfaceNamed:(NSString *)interfaceName;
 - (BOOL)configureInterfaceNamed:(NSString *)interfaceName vlanMode:(NSString *)mode vlanID:(NSInteger)vlanID;
+- (BOOL)applyConfigurationToInterfaceNamed:(NSString *)interfaceName
+                               ipv4Address:(NSString *)ipv4Address
+                                subnetMask:(NSString *)subnetMask
+                           defaultGateway:(NSString *)defaultGateway
+                               ipv6Address:(NSString *)ipv6Address
+                              prefixLength:(NSInteger)prefixLength
+                                  vlanMode:(NSString *)vlanMode
+                                    vlanID:(NSInteger)vlanID;
 
 #ifdef __cplusplus
 - (netlab::Device *)coreDevice;

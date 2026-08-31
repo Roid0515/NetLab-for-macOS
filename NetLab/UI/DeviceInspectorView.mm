@@ -201,21 +201,20 @@
 
 - (void)applyConfiguration:(id)sender {
     NSString *interfaceName = _interfacePopup.titleOfSelectedItem ?: @"";
-    BOOL interfaceValid = [_device configureInterfaceNamed:interfaceName
-                                               ipv4Address:_ipv4Field.stringValue
-                                                subnetMask:_subnetField.stringValue];
-    BOOL gatewayValid = [_device setDefaultGatewayAddress:_gatewayField.stringValue];
-    BOOL ipv6Valid = _ipv6Field.stringValue.length == 0 ||
-        [_device configureInterfaceNamed:interfaceName ipv6Address:_ipv6Field.stringValue prefixLength:64];
-    BOOL vlanValid = [_device configureInterfaceNamed:interfaceName
-                                             vlanMode:_vlanModePopup.titleOfSelectedItem ?: @"Access"
-                                               vlanID:_vlanField.integerValue];
-    if (interfaceValid && gatewayValid && ipv6Valid && vlanValid) {
+    BOOL applied = [_device applyConfigurationToInterfaceNamed:interfaceName
+                                                   ipv4Address:_ipv4Field.stringValue
+                                                    subnetMask:_subnetField.stringValue
+                                               defaultGateway:_gatewayField.stringValue
+                                                   ipv6Address:_ipv6Field.stringValue
+                                                  prefixLength:64
+                                                      vlanMode:_vlanModePopup.titleOfSelectedItem ?: @"Access"
+                                                        vlanID:_vlanField.integerValue];
+    if (applied) {
         _statusLabel.textColor = NSColor.systemGreenColor;
         _statusLabel.stringValue = @"IPv4 configuration applied to the shared device model.";
     } else {
         _statusLabel.textColor = NSColor.systemRedColor;
-        _statusLabel.stringValue = @"Invalid IPv4 address, subnet mask, or gateway.";
+        _statusLabel.stringValue = @"Invalid IPv4, IPv6, gateway, or VLAN; no settings were changed.";
     }
 }
 

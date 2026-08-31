@@ -21,15 +21,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showDevicePalette;
 - (void)clearTopology;
 - (void)fitTopology;
-- (void)loadMilestone2DemoTopology;
-- (void)loadMilestone3DemoTopology;
 - (void)loadMilestone7DemoTopology;
 - (NSString *)runPingFromDevice:(DeviceNodeView *)source targetAddress:(NSString *)targetAddress;
 - (NSString *)requestDHCPForDevice:(DeviceNodeView *)device;
 - (NSString *)advancedStatusForDevice:(DeviceNodeView *)device;
-- (BOOL)runMilestone3SelfTest;
-- (BOOL)runMilestone7SelfTest;
-- (BOOL)runNodeDeletionSelfTest;
 
 @end
 

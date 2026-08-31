@@ -11,5 +11,19 @@ dist/
 # Intermediate icon-generation folder (the source SVG and Assets.xcassets are tracked)
 NetLab/Resources/AppIcon.iconset/
 
+# Environment / secrets
+.env
+.env.*
+
+# Certificates / keys
+*.pem
+*.key
+*.p12
+*.mobileprovision
+
+# Local secrets
+Secrets.*
+secrets.*
+
 # macOS metadata
 .DS_Store

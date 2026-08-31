@@ -8,7 +8,6 @@
 #include <memory>
 
 @implementation LinkLayerController {
-    NSInteger _speedMbps;
     std::unique_ptr<netlab::Link> _model;
     CAShapeLayer *_lineLayer;
     CAShapeLayer *_firstPulseLayer;
@@ -28,7 +27,6 @@
         _secondNode = secondNode;
         _firstInterfaceName = [firstInterface copy];
         _secondInterfaceName = [secondInterface copy];
-        _speedMbps = speedMbps;
         _valid = YES;
 
         netlab::LinkEndpoint firstEndpoint{firstNode.instanceIdentifier.UTF8String,
@@ -68,17 +66,19 @@
                    dispatch_get_main_queue(), ^{
         LinkLayerController *strongSelf = weakSelf;
         if (!strongSelf || !strongSelf->_valid) return;
-        if (strongSelf->_speedMbps <= 0) {
+        if (strongSelf->_model->speedMbps() <= 0) {
             strongSelf->_model->setState(netlab::LinkState::Down);
             [strongSelf applyStateColor:NSColor.systemGrayColor animated:NO];
             return;
         }
         strongSelf->_model->setState(netlab::LinkState::Up);
-        NSColor *color = strongSelf->_speedMbps <= 100
+        NSColor *color = strongSelf->_model->speedMbps() <= 100
             ? NSColor.systemOrangeColor : NSColor.systemGreenColor;
         [strongSelf applyStateColor:color animated:YES];
     });
 }
+
+- (const netlab::Link &)model { return *_model; }
 
 - (void)applyStateColor:(NSColor *)color animated:(BOOL)animated {
     NSColor *deviceColor = [color colorUsingColorSpace:NSColorSpace.deviceRGBColorSpace] ?: color;

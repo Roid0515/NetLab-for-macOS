@@ -2,22 +2,47 @@
 
 #include "../Protocol/IPv4.hpp"
 
-#include <iomanip>
 #include <algorithm>
+#include <cctype>
+#include <iomanip>
 #include <sstream>
 #include <utility>
 
 namespace netlab {
 
+namespace {
+
+bool isValidHostName(const std::string& name) noexcept {
+    if (name.empty() || name.size() > 253 || name.front() == '.' || name.back() == '.') return false;
+    for (unsigned char character : name) {
+        if (!(std::isalnum(character) || character == '-' || character == '.')) return false;
+    }
+    return true;
+}
+
+bool isIPv4OrAny(const std::string& value) noexcept {
+    if (value == "any") return true;
+    std::uint32_t ignored = 0;
+    return ipv4::parse(value, ignored);
+}
+
+}  // namespace
+
 Device::Device(std::string identifier,
                std::string hostname,
                DeviceRole role,
-               const std::vector<std::pair<std::string, int>>& interfaces)
-    : identifier_(std::move(identifier)), hostname_(std::move(hostname)), role_(role) {
+               const std::vector<std::pair<std::string, int>>& interfaces,
+               std::vector<std::string> capabilities)
+    : identifier_(std::move(identifier)), hostname_(std::move(hostname)), role_(role),
+      capabilities_(std::move(capabilities)) {
     interfaces_.reserve(interfaces.size());
     for (std::size_t index = 0; index < interfaces.size(); ++index) {
         interfaces_.emplace_back(interfaces[index].first, generateMAC(identifier_, index), interfaces[index].second);
     }
+}
+
+bool Device::supportsCapability(const std::string& capability) const noexcept {
+    return std::find(capabilities_.begin(), capabilities_.end(), capability) != capabilities_.end();
 }
 
 bool Device::setDefaultGateway(const std::string& address) {
@@ -28,6 +53,32 @@ bool Device::setDefaultGateway(const std::string& address) {
     std::uint32_t ignored = 0;
     if (!ipv4::parse(address, ignored)) return false;
     defaultGateway_ = address;
+    return true;
+}
+
+bool Device::applyInterfaceConfiguration(const InterfaceConfiguration& configuration) {
+    NetworkInterface* networkInterface = interfaceNamed(configuration.interfaceName);
+    if (!networkInterface) return false;
+
+    NetworkInterface candidate = *networkInterface;
+    if (!candidate.configureIPv4(configuration.ipv4Address, configuration.subnetMask)) return false;
+    if (!configuration.defaultGateway.empty()) {
+        std::uint32_t ignored = 0;
+        if (!ipv4::parse(configuration.defaultGateway, ignored)) return false;
+    }
+    if (configuration.ipv6Address.empty()) {
+        candidate.clearIPv6Configuration();
+    } else if (!candidate.configureIPv6(configuration.ipv6Address,
+                                         configuration.ipv6PrefixLength)) {
+        return false;
+    }
+    const bool vlanValid = configuration.switchportMode == NetworkInterface::SwitchportMode::Trunk
+        ? candidate.configureTrunk(configuration.vlanID, {configuration.vlanID})
+        : candidate.configureAccessVLAN(configuration.vlanID);
+    if (!vlanValid) return false;
+
+    *networkInterface = std::move(candidate);
+    defaultGateway_ = configuration.defaultGateway;
     return true;
 }
 
@@ -80,7 +131,7 @@ void Device::learnMAC(const std::string& macAddress, const std::string& interfac
 bool Device::addStaticRoute(const std::string& destination, const std::string& subnetMask,
                             const std::string& nextHop, const std::string& interfaceName) {
     std::uint32_t ignored = 0;
-    if (!ipv4::parse(destination, ignored) ||
+    if (!supportsCapability("L3_ROUTING") || !ipv4::parse(destination, ignored) ||
         (subnetMask != "0.0.0.0" && !ipv4::isValidSubnetMask(subnetMask)) ||
         (!nextHop.empty() && !ipv4::parse(nextHop, ignored))) return false;
     staticRoutes_.push_back({destination, subnetMask, nextHop, interfaceName, 1,
@@ -96,10 +147,7 @@ std::vector<RouteEntry> Device::routingTable() const {
         if (!ipv4::parse(networkInterface.ipv4Address(), address) ||
             !ipv4::parse(networkInterface.subnetMask(), mask)) continue;
         std::uint32_t network = address & mask;
-        std::ostringstream destination;
-        destination << ((network >> 24) & 0xff) << '.' << ((network >> 16) & 0xff) << '.'
-                    << ((network >> 8) & 0xff) << '.' << (network & 0xff);
-        routes.push_back({destination.str(), networkInterface.subnetMask(), {},
+        routes.push_back({ipv4::format(network), networkInterface.subnetMask(), {},
                           networkInterface.name(), 0, "CONNECTED"});
     }
     routes.insert(routes.end(), staticRoutes_.begin(), staticRoutes_.end());
@@ -125,34 +173,89 @@ std::optional<RouteEntry> Device::bestRoute(const std::string& destination) cons
     return best;
 }
 
-void Device::setDHCPServer(bool enabled, std::string network, std::string subnetMask,
+bool Device::setDHCPServer(bool enabled, std::string network, std::string subnetMask,
                            std::string gateway, std::string dnsServer) {
+    if (!supportsCapability("DHCP_SERVER")) return false;
+    if (enabled) {
+        std::uint32_t networkValue = 0, maskValue = 0, ignored = 0;
+        if (!ipv4::parse(network, networkValue) || !ipv4::parse(subnetMask, maskValue) ||
+            !ipv4::isValidSubnetMask(subnetMask) ||
+            (!gateway.empty() && !ipv4::parse(gateway, ignored)) ||
+            (!dnsServer.empty() && !ipv4::parse(dnsServer, ignored))) return false;
+        network = ipv4::format(networkValue & maskValue);
+    }
     dhcpServerEnabled_ = enabled;
     dhcpNetwork_ = std::move(network);
     dhcpSubnetMask_ = std::move(subnetMask);
     dhcpGateway_ = std::move(gateway);
     dhcpDNSServer_ = std::move(dnsServer);
+    if (!enabled) dhcpLeases_.clear();
+    return true;
 }
 
-void Device::addDHCPLease(const std::string& client, const std::string& address) {
+bool Device::applyDHCPLeaseConfiguration(const std::string& interfaceName,
+                                         const std::string& address,
+                                         const std::string& subnetMask,
+                                         const std::string& gateway,
+                                         const std::string& dnsServer) {
+    NetworkInterface* networkInterface = interfaceNamed(interfaceName);
+    if (!networkInterface) return false;
+    NetworkInterface candidate = *networkInterface;
+    std::uint32_t ignored = 0;
+    if (!candidate.configureIPv4(address, subnetMask) ||
+        (!gateway.empty() && !ipv4::parse(gateway, ignored)) ||
+        (!dnsServer.empty() && !ipv4::parse(dnsServer, ignored))) return false;
+    *networkInterface = std::move(candidate);
+    defaultGateway_ = gateway;
+    dnsServer_ = dnsServer;
+    return true;
+}
+
+bool Device::addDHCPLease(const std::string& client, const std::string& address) {
+    std::uint32_t ignored = 0;
+    if (!dhcpServerEnabled_ || client.empty() || !ipv4::parse(address, ignored)) return false;
     dhcpLeases_[client] = address;
+    return true;
 }
 
-void Device::addDNSRecord(const std::string& name, const std::string& address) {
+bool Device::setDNSServer(std::string address) {
+    std::uint32_t ignored = 0;
+    if (!address.empty() && !ipv4::parse(address, ignored)) return false;
+    dnsServer_ = std::move(address);
+    return true;
+}
+
+bool Device::addDNSRecord(const std::string& name, const std::string& address) {
+    std::uint32_t ignored = 0;
+    if (!supportsCapability("DNS_SERVER") || !isValidHostName(name) ||
+        !ipv4::parse(address, ignored)) return false;
     dnsRecords_[name] = address;
+    return true;
 }
 
-void Device::setNATEnabled(bool enabled, std::string publicAddress) {
+bool Device::setNATEnabled(bool enabled, std::string publicAddress) {
+    std::uint32_t ignored = 0;
+    if (!supportsCapability("NAT") ||
+        (enabled && !ipv4::parse(publicAddress, ignored))) return false;
     natEnabled_ = enabled;
     natPublicAddress_ = std::move(publicAddress);
+    if (!enabled) natTranslations_.clear();
+    return true;
 }
 
-void Device::addNATTranslation(std::string insideLocal, std::string insideGlobal) {
+bool Device::addNATTranslation(std::string insideLocal, std::string insideGlobal) {
+    std::uint32_t ignored = 0;
+    if (!natEnabled_ || !ipv4::parse(insideLocal, ignored) ||
+        !ipv4::parse(insideGlobal, ignored)) return false;
     natTranslations_.push_back({std::move(insideLocal), std::move(insideGlobal)});
+    return true;
 }
 
-void Device::addACLRule(ACLRule rule) {
+bool Device::addACLRule(ACLRule rule) {
+    if (!supportsCapability("ACL") || !isIPv4OrAny(rule.source) ||
+        !isIPv4OrAny(rule.destination)) return false;
     aclRules_.push_back(std::move(rule));
+    return true;
 }
 
 bool Device::permits(const std::string& source, const std::string& destination) const noexcept {
@@ -164,14 +267,36 @@ bool Device::permits(const std::string& source, const std::string& destination) 
     return true;
 }
 
-void Device::setWireless(std::string ssid, bool secured) {
-    wirelessSSID_ = std::move(ssid);
-    wirelessSecured_ = secured;
+bool Device::enableSTP(bool enabled) noexcept {
+    if (!supportsCapability("STP")) return false;
+    stpEnabled_ = enabled;
+    return true;
 }
 
-void Device::setVPNTunnel(std::string peer, bool up) {
+bool Device::setDynamicRoutingProtocol(std::string protocol) {
+    if (!supportsCapability("L3_ROUTING")) return false;
+    dynamicRoutingProtocol_ = std::move(protocol);
+    return true;
+}
+
+bool Device::setWireless(std::string ssid, bool secured) {
+    if (!supportsCapability("WIRELESS") || ssid.empty()) return false;
+    wirelessSSID_ = std::move(ssid);
+    wirelessSecured_ = secured;
+    return true;
+}
+
+bool Device::setFirewallEnabled(bool enabled) noexcept {
+    if (!supportsCapability("FIREWALL")) return false;
+    firewallEnabled_ = enabled;
+    return true;
+}
+
+bool Device::setVPNTunnel(std::string peer, bool up) {
+    if (!supportsCapability("VPN") || (up && peer.empty())) return false;
     vpnPeer_ = std::move(peer);
     vpnUp_ = up;
+    return true;
 }
 
 std::string Device::generateMAC(const std::string& identifier, std::size_t interfaceIndex) {

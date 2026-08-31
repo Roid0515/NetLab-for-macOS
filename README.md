@@ -32,8 +32,8 @@ STP/동적 라우팅/IPv6/Wireless/Firewall/VPN은 실제 운영체제 네트워
 학습자가 장비를 추가하고 연결한 뒤 Ping하는 과정은 [NetLab_간단_사용설명서.md](NetLab_간단_사용설명서.md)에 정리되어 있습니다.
 
 ```sh
-NetLab.app/Contents/MacOS/NetLab --self-test
-NetLab.app/Contents/MacOS/NetLab --ui-self-test
+xcodebuild -project NetLab.xcodeproj -scheme NetLabTests -configuration Debug -derivedDataPath build build
+./build/Build/Products/Debug/NetLabTests
 ```
 
 외부 라이브러리나 외부 이미지 자산은 포함하지 않습니다.

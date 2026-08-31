@@ -9,6 +9,15 @@
 @interface TopologyView () <DeviceNodeViewDelegate>
 @end
 
+static netlab::SimulationEngine NLBuildSimulationEngine(
+    NSArray<DeviceNodeView *> *nodes,
+    NSArray<LinkLayerController *> *links) {
+    netlab::SimulationEngine engine;
+    for (DeviceNodeView *node in nodes) engine.addDevice(*node.coreDevice);
+    for (LinkLayerController *link in links) engine.addLink(link.model);
+    return engine;
+}
+
 @implementation TopologyView {
     NSMutableArray<DeviceNodeView *> *_nodes;
     NSMutableOrderedSet<DeviceNodeView *> *_selectedNodes;
@@ -133,14 +142,20 @@
     NSString *name = [NSString stringWithFormat:@"%@%ld", prefix, (long)next];
     NSMutableArray<NSString *> *interfaceNames = [NSMutableArray array];
     NSMutableArray<NSNumber *> *interfaceSpeeds = [NSMutableArray array];
+    NSMutableArray<NSString *> *capabilities = [NSMutableArray array];
     for (const auto& interfaceDefinition : match->interfaces) {
         [interfaceNames addObject:[NSString stringWithUTF8String:interfaceDefinition.name.c_str()]];
         [interfaceSpeeds addObject:@(interfaceDefinition.speedMbps)];
     }
+    for (const auto& capability : match->capabilities) {
+        [capabilities addObject:[NSString stringWithUTF8String:capability.c_str()]];
+    }
     DeviceNodeView *node = [[DeviceNodeView alloc] initWithDeviceIdentifier:identifier
                                                                 displayName:name
                                                              interfaceNames:interfaceNames
-                                                            interfaceSpeeds:interfaceSpeeds];
+                                                            interfaceSpeeds:interfaceSpeeds
+                                                                       role:static_cast<NSInteger>(match->role)
+                                                               capabilities:capabilities];
     node.delegate = self;
     CGFloat x = MIN(MAX(0, location.x - NSWidth(node.frame) / 2.0),
                     MAX(0, NSWidth(self.bounds) - NSWidth(node.frame)));
@@ -402,40 +417,6 @@
     for (LinkLayerController *link in _links) [link updateGeometry];
 }
 
-- (void)loadMilestone2DemoTopology {
-    [self clearTopology];
-    CGFloat y = MAX(120, NSHeight(self.bounds) * 0.48);
-    DeviceNodeView *pc = [self createDeviceWithIdentifier:@"desktop-pc"
-                                                centeredAt:NSMakePoint(NSWidth(self.bounds) * 0.20, y)];
-    DeviceNodeView *switchNode = [self createDeviceWithIdentifier:@"l2-switch"
-                                                        centeredAt:NSMakePoint(NSWidth(self.bounds) * 0.50, y)];
-    DeviceNodeView *router = [self createDeviceWithIdentifier:@"generic-router"
-                                                    centeredAt:NSMakePoint(NSWidth(self.bounds) * 0.80, y)];
-    if (!pc || !switchNode || !router) return;
-    [self createLinkFromNode:pc interface:@"G0" toNode:switchNode interface:@"G0/1"];
-    [self createLinkFromNode:switchNode interface:@"F0/1" toNode:router interface:@"G0/0"];
-    [self clearAllSelection];
-}
-
-- (void)loadMilestone3DemoTopology {
-    [self clearTopology];
-    CGFloat y = MAX(120, NSHeight(self.bounds) * 0.48);
-    DeviceNodeView *pc1 = [self createDeviceWithIdentifier:@"desktop-pc"
-                                                 centeredAt:NSMakePoint(NSWidth(self.bounds) * 0.20, y)];
-    DeviceNodeView *switchNode = [self createDeviceWithIdentifier:@"l2-switch"
-                                                        centeredAt:NSMakePoint(NSWidth(self.bounds) * 0.50, y)];
-    DeviceNodeView *pc2 = [self createDeviceWithIdentifier:@"desktop-pc"
-                                                 centeredAt:NSMakePoint(NSWidth(self.bounds) * 0.80, y)];
-    if (!pc1 || !switchNode || !pc2) return;
-    [pc1 configureInterfaceNamed:@"G0" ipv4Address:@"192.168.1.10" subnetMask:@"255.255.255.0"];
-    [pc1 setDefaultGatewayAddress:@"192.168.1.1"];
-    [pc2 configureInterfaceNamed:@"G0" ipv4Address:@"192.168.1.20" subnetMask:@"255.255.255.0"];
-    [pc2 setDefaultGatewayAddress:@"192.168.1.1"];
-    [self createLinkFromNode:pc1 interface:@"G0" toNode:switchNode interface:@"G0/1"];
-    [self createLinkFromNode:switchNode interface:@"F0/1" toNode:pc2 interface:@"G0"];
-    [self clearAllSelection];
-}
-
 - (void)loadMilestone7DemoTopology {
     [self clearTopology];
     CGFloat width = NSWidth(self.bounds);
@@ -453,6 +434,7 @@
 
     [pc1 configureInterfaceNamed:@"G0" ipv4Address:@"10.10.10.10" subnetMask:@"255.255.255.0"];
     [pc1 setDefaultGatewayAddress:@"10.10.10.1"];
+    pc1.coreDevice->setDNSServer("10.10.10.53");
     [pc2 configureInterfaceNamed:@"G0" ipv4Address:@"20.20.20.10" subnetMask:@"255.255.255.0"];
     [pc2 setDefaultGatewayAddress:@"20.20.20.1"];
     [server configureInterfaceNamed:@"G0" ipv4Address:@"10.10.10.53" subnetMask:@"255.255.255.0"];
@@ -494,14 +476,7 @@
 }
 
 - (NSString *)runPingFromDevice:(DeviceNodeView *)source targetAddress:(NSString *)targetAddress {
-    netlab::SimulationEngine engine;
-    for (DeviceNodeView *node in _nodes) engine.addDevice(*node.coreDevice);
-    for (LinkLayerController *link in _links) {
-        engine.addEthernetConnection({link.firstNode.coreDevice,
-                                      link.firstInterfaceName.UTF8String,
-                                      link.secondNode.coreDevice,
-                                      link.secondInterfaceName.UTF8String});
-    }
+    netlab::SimulationEngine engine = NLBuildSimulationEngine(_nodes, _links);
     netlab::PingResult result = engine.ping(*source.coreDevice, targetAddress.UTF8String);
     NSMutableString *output = [NSMutableString stringWithFormat:@"ping %@\n\n", targetAddress];
     for (const auto& event : result.events) {
@@ -513,12 +488,7 @@
 }
 
 - (NSString *)requestDHCPForDevice:(DeviceNodeView *)device {
-    netlab::SimulationEngine engine;
-    for (DeviceNodeView *node in _nodes) engine.addDevice(*node.coreDevice);
-    for (LinkLayerController *link in _links) {
-        engine.addEthernetConnection({link.firstNode.coreDevice, link.firstInterfaceName.UTF8String,
-                                      link.secondNode.coreDevice, link.secondInterfaceName.UTF8String});
-    }
+    netlab::SimulationEngine engine = NLBuildSimulationEngine(_nodes, _links);
     netlab::ServiceResult result = engine.requestDHCP(*device.coreDevice);
     NSMutableString *output = [NSMutableString stringWithString:@"DHCP CLIENT\n\n"];
     for (const auto& event : result.events) [output appendFormat:@"[%s] %s\n", event.stage.c_str(), event.detail.c_str()];
@@ -527,43 +497,8 @@
 }
 
 - (NSString *)advancedStatusForDevice:(DeviceNodeView *)device {
-    netlab::SimulationEngine engine;
-    for (DeviceNodeView *node in _nodes) engine.addDevice(*node.coreDevice);
+    netlab::SimulationEngine engine = NLBuildSimulationEngine(_nodes, _links);
     return [NSString stringWithUTF8String:engine.advancedStatus(*device.coreDevice).c_str()];
-}
-
-- (BOOL)runMilestone3SelfTest {
-    [self loadMilestone3DemoTopology];
-    DeviceNodeView *source = nil;
-    for (DeviceNodeView *node in _nodes) {
-        if ([node.displayName isEqualToString:@"PC1"]) {
-            source = node;
-            break;
-        }
-    }
-    if (!source) return NO;
-    NSString *result = [self runPingFromDevice:source targetAddress:@"192.168.1.20"];
-    return [result containsString:@"SUCCESS"] && [source.arpTableText containsString:@"192.168.1.20"];
-}
-
-- (BOOL)runMilestone7SelfTest {
-    [self loadMilestone7DemoTopology];
-    DeviceNodeView *source = nil;
-    for (DeviceNodeView *node in _nodes) if ([node.displayName isEqualToString:@"PC1"]) source = node;
-    if (!source) return NO;
-    NSString *dhcp = [self requestDHCPForDevice:source];
-    NSString *ping = [self runPingFromDevice:source targetAddress:@"pc2.netlab"];
-    return [dhcp containsString:@"SUCCESS"] && [ping containsString:@"SUCCESS"] &&
-           [ping containsString:@"Routing"] && [ping containsString:@"NAT"] &&
-           _nodes.count == 8 && _links.count == 7;
-}
-
-- (BOOL)runNodeDeletionSelfTest {
-    [self loadMilestone7DemoTopology];
-    if (_nodes.count != 8 || _links.count != 7) return NO;
-    DeviceNodeView *node = _nodes.firstObject;
-    [self deleteDevice:node];
-    return _nodes.count == 7 && _links.count == 6 && ![self.subviews containsObject:node];
 }
 
 @end

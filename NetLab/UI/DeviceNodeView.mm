@@ -16,7 +16,9 @@
 - (instancetype)initWithDeviceIdentifier:(NSString *)identifier
                               displayName:(NSString *)displayName
                            interfaceNames:(NSArray<NSString *> *)interfaceNames
-                          interfaceSpeeds:(NSArray<NSNumber *> *)interfaceSpeeds {
+                          interfaceSpeeds:(NSArray<NSNumber *> *)interfaceSpeeds
+                                     role:(NSInteger)role
+                             capabilities:(NSArray<NSString *> *)capabilities {
     self = [super initWithFrame:NSMakeRect(0, 0, 112, 86)];
     if (self) {
         _deviceIdentifier = [identifier copy];
@@ -29,15 +31,13 @@
             coreInterfaces.emplace_back(interfaceNames[index].UTF8String,
                                         static_cast<int>(interfaceSpeeds[index].integerValue));
         }
-        netlab::DeviceRole role = netlab::DeviceRole::Endpoint;
-        if ([identifier isEqualToString:@"l2-switch"]) role = netlab::DeviceRole::Switch;
-        if ([identifier isEqualToString:@"generic-router"]) role = netlab::DeviceRole::Router;
-        if ([identifier isEqualToString:@"firewall"]) role = netlab::DeviceRole::Firewall;
-        if ([identifier isEqualToString:@"wireless-ap"]) role = netlab::DeviceRole::WirelessAP;
-        if ([identifier isEqualToString:@"generic-server"]) role = netlab::DeviceRole::Server;
+        std::vector<std::string> coreCapabilities;
+        coreCapabilities.reserve(capabilities.count);
+        for (NSString *capability in capabilities) coreCapabilities.emplace_back(capability.UTF8String);
         _coreDevice = std::make_unique<netlab::Device>(_instanceIdentifier.UTF8String,
                                                        _displayName.UTF8String,
-                                                       role, coreInterfaces);
+                                                       static_cast<netlab::DeviceRole>(role), coreInterfaces,
+                                                       std::move(coreCapabilities));
         self.wantsLayer = YES;
         self.layer.cornerRadius = 9.0;
         self.accessibilityElement = YES;
@@ -156,8 +156,30 @@
     netlab::NetworkInterface *networkInterface = _coreDevice->interfaceNamed(interfaceName.UTF8String);
     if (!networkInterface) return NO;
     return [mode isEqualToString:@"Trunk"]
-        ? networkInterface->configureTrunk((int)vlanID, {(int)vlanID, 10, 20})
+        ? networkInterface->configureTrunk((int)vlanID, {(int)vlanID})
         : networkInterface->configureAccessVLAN((int)vlanID);
+}
+
+- (BOOL)applyConfigurationToInterfaceNamed:(NSString *)interfaceName
+                               ipv4Address:(NSString *)ipv4Address
+                                subnetMask:(NSString *)subnetMask
+                           defaultGateway:(NSString *)defaultGateway
+                               ipv6Address:(NSString *)ipv6Address
+                              prefixLength:(NSInteger)prefixLength
+                                  vlanMode:(NSString *)vlanMode
+                                    vlanID:(NSInteger)vlanID {
+    netlab::InterfaceConfiguration configuration;
+    configuration.interfaceName = interfaceName.UTF8String;
+    configuration.ipv4Address = ipv4Address.UTF8String;
+    configuration.subnetMask = subnetMask.UTF8String;
+    configuration.defaultGateway = defaultGateway.UTF8String;
+    configuration.ipv6Address = ipv6Address.UTF8String;
+    configuration.ipv6PrefixLength = static_cast<int>(prefixLength);
+    configuration.switchportMode = [vlanMode isEqualToString:@"Trunk"]
+        ? netlab::NetworkInterface::SwitchportMode::Trunk
+        : netlab::NetworkInterface::SwitchportMode::Access;
+    configuration.vlanID = static_cast<int>(vlanID);
+    return _coreDevice->applyInterfaceConfiguration(configuration);
 }
 
 - (BOOL)isFlipped {

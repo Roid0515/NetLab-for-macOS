@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DeviceDefinition.hpp"
 #include "NetworkInterface.hpp"
 
 #include <map>
@@ -8,8 +9,6 @@
 #include <vector>
 
 namespace netlab {
-
-enum class DeviceRole { Endpoint, Switch, Router, Server, Firewall, WirelessAP };
 
 struct RouteEntry {
     std::string destination;
@@ -32,18 +31,32 @@ struct NATTranslation {
     std::string insideGlobal;
 };
 
+struct InterfaceConfiguration {
+    std::string interfaceName;
+    std::string ipv4Address;
+    std::string subnetMask;
+    std::string defaultGateway;
+    std::string ipv6Address;
+    int ipv6PrefixLength = 64;
+    NetworkInterface::SwitchportMode switchportMode = NetworkInterface::SwitchportMode::Access;
+    int vlanID = 1;
+};
+
 class Device final {
 public:
     Device(std::string identifier,
            std::string hostname,
            DeviceRole role,
-           const std::vector<std::pair<std::string, int>>& interfaces);
+           const std::vector<std::pair<std::string, int>>& interfaces,
+           std::vector<std::string> capabilities = {});
 
     const std::string& identifier() const noexcept { return identifier_; }
     const std::string& hostname() const noexcept { return hostname_; }
     DeviceRole role() const noexcept { return role_; }
+    bool supportsCapability(const std::string& capability) const noexcept;
     const std::string& defaultGateway() const noexcept { return defaultGateway_; }
     bool setDefaultGateway(const std::string& address);
+    bool applyInterfaceConfiguration(const InterfaceConfiguration& configuration);
 
     std::vector<NetworkInterface>& interfaces() noexcept { return interfaces_; }
     const std::vector<NetworkInterface>& interfaces() const noexcept { return interfaces_; }
@@ -63,36 +76,43 @@ public:
     std::vector<RouteEntry> routingTable() const;
     std::optional<RouteEntry> bestRoute(const std::string& destination) const;
 
-    void setDHCPServer(bool enabled, std::string network = {}, std::string subnetMask = {},
+    bool setDHCPServer(bool enabled, std::string network = {}, std::string subnetMask = {},
                        std::string gateway = {}, std::string dnsServer = {});
     bool dhcpServerEnabled() const noexcept { return dhcpServerEnabled_; }
     const std::string& dhcpNetwork() const noexcept { return dhcpNetwork_; }
     const std::string& dhcpSubnetMask() const noexcept { return dhcpSubnetMask_; }
     const std::string& dhcpGateway() const noexcept { return dhcpGateway_; }
     const std::string& dhcpDNSServer() const noexcept { return dhcpDNSServer_; }
-    void addDHCPLease(const std::string& client, const std::string& address);
+    bool applyDHCPLeaseConfiguration(const std::string& interfaceName,
+                                     const std::string& address,
+                                     const std::string& subnetMask,
+                                     const std::string& gateway,
+                                     const std::string& dnsServer);
+    bool addDHCPLease(const std::string& client, const std::string& address);
     const std::map<std::string, std::string>& dhcpLeases() const noexcept { return dhcpLeases_; }
-    void addDNSRecord(const std::string& name, const std::string& address);
+    bool setDNSServer(std::string address);
+    const std::string& dnsServer() const noexcept { return dnsServer_; }
+    bool addDNSRecord(const std::string& name, const std::string& address);
     const std::map<std::string, std::string>& dnsRecords() const noexcept { return dnsRecords_; }
-    void setNATEnabled(bool enabled, std::string publicAddress = {});
+    bool setNATEnabled(bool enabled, std::string publicAddress = {});
     bool natEnabled() const noexcept { return natEnabled_; }
     const std::string& natPublicAddress() const noexcept { return natPublicAddress_; }
-    void addNATTranslation(std::string insideLocal, std::string insideGlobal);
+    bool addNATTranslation(std::string insideLocal, std::string insideGlobal);
     const std::vector<NATTranslation>& natTranslations() const noexcept { return natTranslations_; }
-    void addACLRule(ACLRule rule);
+    bool addACLRule(ACLRule rule);
     const std::vector<ACLRule>& aclRules() const noexcept { return aclRules_; }
     bool permits(const std::string& source, const std::string& destination) const noexcept;
 
-    void enableSTP(bool enabled) noexcept { stpEnabled_ = enabled; }
+    bool enableSTP(bool enabled) noexcept;
     bool stpEnabled() const noexcept { return stpEnabled_; }
-    void setDynamicRoutingProtocol(std::string protocol) { dynamicRoutingProtocol_ = std::move(protocol); }
+    bool setDynamicRoutingProtocol(std::string protocol);
     const std::string& dynamicRoutingProtocol() const noexcept { return dynamicRoutingProtocol_; }
-    void setWireless(std::string ssid, bool secured);
+    bool setWireless(std::string ssid, bool secured);
     const std::string& wirelessSSID() const noexcept { return wirelessSSID_; }
     bool wirelessSecured() const noexcept { return wirelessSecured_; }
-    void setFirewallEnabled(bool enabled) noexcept { firewallEnabled_ = enabled; }
+    bool setFirewallEnabled(bool enabled) noexcept;
     bool firewallEnabled() const noexcept { return firewallEnabled_; }
-    void setVPNTunnel(std::string peer, bool up);
+    bool setVPNTunnel(std::string peer, bool up);
     const std::string& vpnPeer() const noexcept { return vpnPeer_; }
     bool vpnUp() const noexcept { return vpnUp_; }
 
@@ -102,6 +122,7 @@ private:
     std::string identifier_;
     std::string hostname_;
     DeviceRole role_;
+    std::vector<std::string> capabilities_;
     std::vector<NetworkInterface> interfaces_;
     std::string defaultGateway_;
     std::map<std::string, std::string> arpTable_;
@@ -113,6 +134,7 @@ private:
     std::string dhcpGateway_;
     std::string dhcpDNSServer_;
     std::map<std::string, std::string> dhcpLeases_;
+    std::string dnsServer_;
     std::map<std::string, std::string> dnsRecords_;
     bool natEnabled_ = false;
     std::string natPublicAddress_;

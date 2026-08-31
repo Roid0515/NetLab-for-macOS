@@ -2,8 +2,10 @@
 
 #include "../Protocol/IPv4.hpp"
 
-#include <utility>
+#include <arpa/inet.h>
+
 #include <algorithm>
+#include <utility>
 
 namespace netlab {
 
@@ -15,20 +17,35 @@ bool NetworkInterface::hasIPv4Configuration() const noexcept {
 }
 
 bool NetworkInterface::configureIPv4(const std::string& address, const std::string& subnetMask) {
-    std::uint32_t ignored = 0;
-    if (!ipv4::parse(address, ignored) || !ipv4::isValidSubnetMask(subnetMask)) return false;
+    if (!isValidIPv4Configuration(address, subnetMask)) return false;
     ipv4Address_ = address;
     subnetMask_ = subnetMask;
     return true;
 }
 
+bool NetworkInterface::isValidIPv4Configuration(const std::string& address,
+                                                 const std::string& subnetMask) noexcept {
+    std::uint32_t ignored = 0;
+    return ipv4::parse(address, ignored) && ipv4::isValidSubnetMask(subnetMask);
+}
+
 bool NetworkInterface::configureIPv6(const std::string& address, int prefixLength) {
-    if (address.empty() || address.find(':') == std::string::npos || prefixLength < 1 || prefixLength > 128) {
-        return false;
-    }
+    if (!isValidIPv6Configuration(address, prefixLength)) return false;
     ipv6Address_ = address;
     ipv6PrefixLength_ = prefixLength;
     return true;
+}
+
+bool NetworkInterface::isValidIPv6Configuration(const std::string& address,
+                                                 int prefixLength) noexcept {
+    if (address.empty() || prefixLength < 0 || prefixLength > 128) return false;
+    in6_addr parsed{};
+    return inet_pton(AF_INET6, address.c_str(), &parsed) == 1;
+}
+
+void NetworkInterface::clearIPv6Configuration() noexcept {
+    ipv6Address_.clear();
+    ipv6PrefixLength_ = 0;
 }
 
 bool NetworkInterface::configureAccessVLAN(int vlanID) {

@@ -5,6 +5,8 @@
 
 namespace netlab {
 
+enum class DeviceRole { Endpoint, Switch, Router, Server, Firewall, WirelessAP };
+
 enum class DeviceCategory {
     Router,
     Switch,
@@ -30,6 +32,7 @@ struct InterfaceDefinition {
 struct DeviceDefinition {
     std::string identifier;
     DeviceCategory category;
+    DeviceRole role;
     std::string displayName;
     std::string defaultNamePrefix;
     std::vector<InterfaceDefinition> interfaces;

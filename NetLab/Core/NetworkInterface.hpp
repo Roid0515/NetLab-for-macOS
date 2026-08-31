@@ -19,9 +19,14 @@ public:
     const std::string& subnetMask() const noexcept { return subnetMask_; }
     bool hasIPv4Configuration() const noexcept;
     bool configureIPv4(const std::string& address, const std::string& subnetMask);
+    static bool isValidIPv4Configuration(const std::string& address,
+                                         const std::string& subnetMask) noexcept;
     const std::string& ipv6Address() const noexcept { return ipv6Address_; }
     int ipv6PrefixLength() const noexcept { return ipv6PrefixLength_; }
     bool configureIPv6(const std::string& address, int prefixLength);
+    static bool isValidIPv6Configuration(const std::string& address,
+                                         int prefixLength) noexcept;
+    void clearIPv6Configuration() noexcept;
 
     SwitchportMode switchportMode() const noexcept { return switchportMode_; }
     int accessVLAN() const noexcept { return accessVLAN_; }
