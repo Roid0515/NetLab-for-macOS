@@ -1,6 +1,6 @@
 # NetLab for macOS
 
-NetLab 1.0은 AppKit + Objective-C++ UI와 C++17 시뮬레이션 엔진으로 만든 가벼운 macOS 네트워크 학습 앱입니다. `macOS_NetLab_Codex_작업지시서.md`의 Milestone 1~7을 교육용 논리 모델로 구현합니다.
+NetLab 1.2는 AppKit + Objective-C++ UI와 C++17 시뮬레이션 엔진으로 만든 가벼운 macOS 네트워크 학습 앱입니다. `macOS_NetLab_Codex_작업지시서.md`의 Milestone 1~7을 교육용 논리 모델로 구현합니다.
 
 ## 실행 및 빌드
 
@@ -22,6 +22,7 @@ xcodebuild -project NetLab.xcodeproj -scheme NetLab -configuration Release build
 - Palette: Router, Switch, Firewall, Wireless AP, Services Server, Desktop PC용 자체 벡터 아이콘
 - Demo: 두 Subnet, Router, Services, AP, Firewall을 포함한 통합 학습 토폴로지
 - Add Device: 선택된 노드의 Inspector에서 장비 목록으로 즉시 전환
+- Delete Device: Toolbar, Delete/Backspace 키, 노드 우클릭 메뉴, Inspector 버튼 지원
 
 STP/동적 라우팅/IPv6/Wireless/Firewall/VPN은 실제 운영체제 네트워크나 암호화를 사용하는 에뮬레이션이 아니라 핵심 개념과 상태를 보여 주는 단순화 모델입니다.
 

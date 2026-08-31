@@ -210,6 +210,10 @@
     [self updateLinkGeometry];
 }
 
+- (void)deviceNodeViewDidRequestDeletion:(DeviceNodeView *)node {
+    [self deleteDevice:node];
+}
+
 - (void)selectOnlyNode:(DeviceNodeView *)node {
     [self clearAllSelection];
     [_selectedNodes addObject:node];
@@ -240,22 +244,29 @@
 }
 
 - (void)deleteSelection {
-    NSArray<DeviceNodeView *> *nodesToDelete = _selectedNodes.array;
+    NSArray<DeviceNodeView *> *nodesToDelete = [_selectedNodes.array copy];
     [self clearSelection];
     if (nodesToDelete.count == 0 && _selectedLink) {
         [self removeLink:_selectedLink];
         [self clearLinkSelection];
         return;
     }
-    for (DeviceNodeView *node in nodesToDelete) {
-        NSArray<LinkLayerController *> *attached = [_links filteredArrayUsingPredicate:
-            [NSPredicate predicateWithBlock:^BOOL(LinkLayerController *link, NSDictionary *bindings) {
-                return [link isAttachedToNode:node];
-            }]];
-        for (LinkLayerController *link in attached) [self removeLink:link];
-        [_nodes removeObject:node];
-        [node removeFromSuperview];
-    }
+    for (DeviceNodeView *node in nodesToDelete) [self deleteDevice:node];
+    [self setNeedsDisplay:YES];
+}
+
+- (void)deleteDevice:(DeviceNodeView *)device {
+    if (!device || ![_nodes containsObject:device]) return;
+    [_selectedNodes removeObject:device];
+    device.selected = NO;
+    NSArray<LinkLayerController *> *attached = [_links filteredArrayUsingPredicate:
+        [NSPredicate predicateWithBlock:^BOOL(LinkLayerController *link, NSDictionary *bindings) {
+            return [link isAttachedToNode:device];
+        }]];
+    for (LinkLayerController *link in attached) [self removeLink:link];
+    [_nodes removeObject:device];
+    [device removeFromSuperview];
+    [self.selectionDelegate topologyView:self didSelectDevice:nil];
     [self setNeedsDisplay:YES];
 }
 
@@ -545,6 +556,14 @@
     return [dhcp containsString:@"SUCCESS"] && [ping containsString:@"SUCCESS"] &&
            [ping containsString:@"Routing"] && [ping containsString:@"NAT"] &&
            _nodes.count == 8 && _links.count == 7;
+}
+
+- (BOOL)runNodeDeletionSelfTest {
+    [self loadMilestone7DemoTopology];
+    if (_nodes.count != 8 || _links.count != 7) return NO;
+    DeviceNodeView *node = _nodes.firstObject;
+    [self deleteDevice:node];
+    return _nodes.count == 7 && _links.count == 6 && ![self.subviews containsObject:node];
 }
 
 @end

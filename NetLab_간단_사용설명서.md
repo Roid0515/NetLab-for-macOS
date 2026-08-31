@@ -19,7 +19,14 @@ NetLab은 실제 네트워크 패킷을 외부로 보내지 않고, 프로그램
 
 다른 노드를 계속 추가하려면 **Add Device → 장비 Drag & Drop**을 반복합니다. 기존 노드와 설정값은 그대로 유지됩니다.
 
-장비를 삭제하려면 장비를 클릭한 뒤 Delete/Backspace 키 또는 상단 **Delete**를 누릅니다. **New**는 전체 토폴로지를 비웁니다.
+장비를 삭제하려면 다음 중 편한 방법을 사용합니다. 장비를 삭제하면 연결된 링크도 함께 제거됩니다.
+
+- 장비를 우클릭하고 **Delete Device** 선택
+- 장비 선택 후 오른쪽 Inspector의 **Delete Device** 선택
+- 장비 선택 후 상단 **Delete** 선택
+- 장비 선택 후 Delete/Backspace 키 입력
+
+**New**는 전체 토폴로지를 비웁니다.
 
 ## 3. 노드 연결하기
 
@@ -72,4 +79,4 @@ Demo에는 `PC1 — Switch1 — Router1 — Switch2 — PC2` 경로와 Services 
 
 ## 현재 범위
 
-NetLab 1.0은 교육용 논리 시뮬레이터입니다. STP, OSPF, RIP, IPv6, Wireless, Firewall, VPN은 구성 상태와 핵심 판정 과정을 학습하도록 단순화되어 있습니다. 실제 무선 전파, 운영체제 네트워크 스택, VPN 암호화 또는 실제 인터넷 통신을 수행하지 않습니다.
+NetLab 1.2는 교육용 논리 시뮬레이터입니다. STP, OSPF, RIP, IPv6, Wireless, Firewall, VPN은 구성 상태와 핵심 판정 과정을 학습하도록 단순화되어 있습니다. 실제 무선 전파, 운영체제 네트워크 스택, VPN 암호화 또는 실제 인터넷 통신을 수행하지 않습니다.

@@ -214,4 +214,21 @@
     [self.delegate deviceNodeView:self didMoveBy:delta];
 }
 
+- (NSMenu *)menuForEvent:(NSEvent *)event {
+    [self.delegate deviceNodeViewDidRequestSelection:self extendingSelection:NO];
+    NSMenu *menu = [[NSMenu alloc] initWithTitle:self.displayName];
+    NSMenuItem *deleteItem = [[NSMenuItem alloc] initWithTitle:@"Delete Device"
+                                                       action:@selector(deleteFromContextMenu:)
+                                                keyEquivalent:@""];
+    deleteItem.target = self;
+    deleteItem.image = [NSImage imageWithSystemSymbolName:@"trash"
+                                 accessibilityDescription:@"Delete Device"];
+    [menu addItem:deleteItem];
+    return menu;
+}
+
+- (void)deleteFromContextMenu:(id)sender {
+    [self.delegate deviceNodeViewDidRequestDeletion:self];
+}
+
 @end

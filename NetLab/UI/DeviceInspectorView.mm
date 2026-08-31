@@ -100,6 +100,13 @@
     toolsRow.distribution = NSStackViewDistributionFillEqually;
     toolsRow.spacing = 8;
 
+    NSButton *deleteButton = [NSButton buttonWithTitle:@"Delete Device"
+                                                 target:self action:@selector(deleteDevice:)];
+    deleteButton.image = [NSImage imageWithSystemSymbolName:@"trash"
+                                    accessibilityDescription:@"Delete Device"];
+    deleteButton.contentTintColor = NSColor.systemRedColor;
+    deleteButton.accessibilityLabel = @"Delete Selected Device";
+
     _statusLabel = [NSTextField wrappingLabelWithString:@"Select an interface and configure IPv4."];
     _statusLabel.font = [NSFont systemFontOfSize:11];
     _statusLabel.textColor = NSColor.secondaryLabelColor;
@@ -133,6 +140,7 @@
         separator,
         [self caption:@"PING"], pingRow,
         toolsRow,
+        deleteButton,
         _statusLabel,
         [self caption:@"PACKET / TABLE OUTPUT"],
     ]];
@@ -142,6 +150,7 @@
     controls.translatesAutoresizingMaskIntoConstraints = NO;
     for (NSView *view in @[_titleLabel, _interfacePopup, _macLabel, _ipv4Field,
                             _subnetField, _gatewayField, _ipv6Field, vlanRow, applyButton, pingRow, toolsRow,
+                            deleteButton,
                             _statusLabel]) {
         [view.widthAnchor constraintEqualToAnchor:controls.widthAnchor].active = YES;
     }
@@ -158,6 +167,13 @@
         [outputScroll.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-16],
         [outputScroll.heightAnchor constraintGreaterThanOrEqualToConstant:120],
     ]];
+}
+
+- (void)deleteDevice:(id)sender {
+    DeviceNodeView *device = _device;
+    if (!device) return;
+    _device = nil;
+    [_topologyView deleteDevice:device];
 }
 
 - (void)inspectDevice:(DeviceNodeView *)device {

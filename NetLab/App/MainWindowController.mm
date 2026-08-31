@@ -168,8 +168,16 @@ static NSToolbarItemIdentifier const NLToolbarFit = @"netlab.fit";
     if (NSWidth(palette.frame) < 240 || NSHeight(palette.frame) <= 0) return NO;
     BOOL demoPassed = [_topologyView runMilestone7SelfTest] &&
                       _topologyView.deviceCount == 8 && _topologyView.linkCount == 7;
+    BOOL deletionPassed = [_topologyView runNodeDeletionSelfTest] &&
+                          _topologyView.deviceCount == 7 && _topologyView.linkCount == 6;
     [_topologyView showDevicePalette];
-    return demoPassed && _sidebarView.isShowingDevicePalette;
+    BOOL palettePassed = _sidebarView.isShowingDevicePalette;
+    if (!demoPassed || !deletionPassed || !palettePassed) {
+        NSLog(@"UI self-test detail: demo=%d deletion=%d palette=%d devices=%lu links=%lu",
+              demoPassed, deletionPassed, palettePassed,
+              (unsigned long)_topologyView.deviceCount, (unsigned long)_topologyView.linkCount);
+    }
+    return demoPassed && deletionPassed && palettePassed;
 }
 
 - (void)topologyView:(TopologyView *)topologyView didSelectDevice:(DeviceNodeView *)device {

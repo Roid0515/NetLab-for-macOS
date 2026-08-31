@@ -11,6 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol DeviceNodeViewDelegate <NSObject>
 - (void)deviceNodeViewDidRequestSelection:(DeviceNodeView *)node extendingSelection:(BOOL)extend;
 - (void)deviceNodeView:(DeviceNodeView *)node didMoveBy:(NSPoint)delta;
+- (void)deviceNodeViewDidRequestDeletion:(DeviceNodeView *)node;
 @end
 
 @interface DeviceNodeView : NSView

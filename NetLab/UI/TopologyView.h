@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, weak, nullable) id<TopologyViewSelectionDelegate> selectionDelegate;
 
 - (void)deleteSelection;
+- (void)deleteDevice:(DeviceNodeView *)device;
 - (void)showDevicePalette;
 - (void)clearTopology;
 - (void)fitTopology;
@@ -28,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)advancedStatusForDevice:(DeviceNodeView *)device;
 - (BOOL)runMilestone3SelfTest;
 - (BOOL)runMilestone7SelfTest;
+- (BOOL)runNodeDeletionSelfTest;
 
 @end
 
