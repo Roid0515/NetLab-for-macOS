@@ -9,6 +9,7 @@
 - 기존 Toolbar Delete와 Delete/Backspace 키 지원 유지
 - 노드 삭제 시 연결된 링크가 함께 제거되는 자동 UI 테스트 추가
 - 사용자 제공 네트워크 스위치 이미지를 기반으로 한 AppIcon 포함
+- macOS Finder가 앱 아이콘을 안정적으로 인식하도록 `CFBundleIconFile` 명시
 
 ## 기존 기능
 
